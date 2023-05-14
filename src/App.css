@@ -30,3 +30,43 @@
   color: #1cade4;
   outline: none;
 }
+
+input::placeholder { 
+  font-size: 0.75em;
+}
+
+
+.dropdown-container {
+  width: 100%;
+  position: relative;
+}
+
+.dropdown-list {
+  max-height: 200px;
+  box-sizing: border-box;
+  overflow: auto;
+  border-style: solid;
+  border-radius: 10px;
+  border-width: 3px;
+  border-color: gray;
+  background-color: #090f23;
+  color: #1cade4;
+  position: absolute;
+  width: 100%;
+  z-index: 9999;
+}
+
+.dropdown-item:nth-child(odd) {
+  background-color: #45484e;
+}
+
+
+.dropdown-item {
+  padding: 0.5em;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #1cade4;
+  color: #090f23;
+}
