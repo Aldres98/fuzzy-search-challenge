@@ -1,17 +1,24 @@
-import { useEffect, useState } from "react";
 import "./App.css";
-import { PhonebookEntry, PhonebookReferenceImplementation } from "./Phonebook";
+import { useCallback, useEffect, useState } from "react";
+import { debounce } from "lodash";
+import { PhonebookEntry, PhonebookImplementation } from "./Phonebook";
 import { PhonebookSamples } from "./PhonebookSamples";
 import ResultsDropdown from "./components/ResultsDropdown";
 
-const phonebook = new PhonebookReferenceImplementation(PhonebookSamples);
+const phonebook = new PhonebookImplementation(PhonebookSamples);
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<PhonebookEntry[]>([]);
+  const debouncedPhonebookSearch = useCallback(
+    debounce((term: string) => setResults(phonebook.match(term)), 300, {
+      trailing: true,
+    }),
+    []
+  );
 
   useEffect(() => {
-    setResults(phonebook.match(searchTerm));
+    debouncedPhonebookSearch(searchTerm);
   }, [searchTerm]);
 
   return (
