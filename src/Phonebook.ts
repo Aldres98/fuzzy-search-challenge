@@ -1,92 +1,65 @@
-
-
 /** Phone book entry with first & last name plus phone nunber */
 
 export type PhonebookEntry = {
-  firstName: string,
-  lastName: string,
-  phoneNumber: string
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
 };
 
-
-/** Interface for phone books allowing for fast search */
-
 export interface PhonebookInterface {
-
-  /** Determines a set of best matches for a search term */
   match(term: string): PhonebookEntry[];
-
 }
 
-/** Phone book implementation serving as reference */
-
 export class PhonebookReferenceImplementation implements PhonebookInterface {
+  private mapLastNameToEntries = new Map<string, [PhonebookEntry, number][]>();
 
-  /** Constructor ingesting a set of entries */
   constructor(entries: PhonebookEntry[]) {
-
-    /* Add all entries */
+    /* Add all last name entries */
     for (const entry of entries)
-      for (const o of this.o(entry.lastName)) {
-
-        /*              */
-        const mre = this.mr.get(o[0]);
-        if (mre)
-          mre.push([entry, o[1]]);
-        else
-          this.mr.set(o[0], [[entry, o[1]]]);
-
+      for (const [substring, weight] of this.getSubstringsWithWeight(
+        entry.lastName
+      )) {
+        /* Get the existing entries for the substring */
+        const existingEntries = this.mapLastNameToEntries.get(substring);
+        // If no existing entries - put there a new array
+        existingEntries
+          ? existingEntries.push([entry, weight])
+          : this.mapLastNameToEntries.set(substring, [[entry, weight]]);
       }
-
   }
 
-  /** Implements the match interface */
   match(term: string): PhonebookEntry[] {
-  
-    /*              */
-    const m = new Map<PhonebookEntry, number>();
+    /* Create a map to keep track of scores for each entry */
+    const scoresMap = new Map<PhonebookEntry, number>();
 
-    /*              */
-    for (const o of this.o(term))
-      for (const mre of this.mr.get(o[0]) || []) {
+    /* Iterate over all substrings with weight for the term */
+    for (const [substring, weight] of this.getSubstringsWithWeight(term))
+      for (const [entry, entryWeight] of this.mapLastNameToEntries.get(
+        substring
+      ) || []) {
+        /* Calculate the score for this entry and substring */
+        const score = weight * entryWeight;
 
-        /*              */
-        const sc = o[1] * mre[1];
-
-        /*              */
-        const me = m.get(mre[0]);
-        if (!me || me < sc)
-          m.set(mre[0], sc);
-
+        /* If this score is higher than the current score for this entry, update it */
+        const existingScore = scoresMap.get(entry);
+        if (!existingScore || existingScore < score)
+          scoresMap.set(entry, score);
       }
 
-    /*              */
-    const s = [...m.entries()].sort((a, b) => { return b[1] - a[1]; });
-
-    /*              */
-    return s.map((e) => { return e[0]; });
-
+    /* Sort the entries by score */
+    const sortedEntries = [...scoresMap.entries()].sort((a, b) => b[1] - a[1]);
+    return sortedEntries.map((entry) => entry[0]);
   }
 
-
-  /**                */
-  private o(name: string) {
-
-    /*              */
+  /** Generate substrings of a name by removing one character at a time and add weight */
+  private getSubstringsWithWeight(name: string) {
     name = name.toLowerCase();
-
-    /*              */
     const res: [string, number][] = [[name, 1]];
 
-    /*              */
+    /* Generate substrings by removing one character at a time */
     for (let i = 0; i < name.length; i++)
       res.push([name.substring(0, i) + name.substring(i + 1), 0.8]);
 
     return res;
-
   }
-
-  /**                */
-  private mr = new Map<string, [PhonebookEntry, number][]>();
-
-};
+}
