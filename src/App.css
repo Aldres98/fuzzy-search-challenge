@@ -1,0 +1,32 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #090f23;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.input-container {
+  height: 40vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.input {
+  width: 30vw;
+  padding: 0.5em;
+  font-size: 1.5em;
+  border-style: solid;
+  border-radius: 10px;
+  border-width: 3px;
+  border-color: white;
+  background-color: #090f23;
+  color: #1cade4;
+  outline: none;
+}
